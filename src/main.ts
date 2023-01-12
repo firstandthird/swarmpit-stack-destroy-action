@@ -1,18 +1,36 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import fetch from 'node-fetch'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const URL = core.getInput('url')
+    const STACK = core.getInput('stack')
+    const API_KEY = core.getInput('api-key')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const headers = {
+      Authorization: `Bearer ${API_KEY}`
+    }
 
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    const endpoint = `${URL}/api/stacks/${STACK}`
+
+    const destroyResponse = await fetch(endpoint, {
+      method: 'delete',
+      headers
+    })
+
+    if (!destroyResponse.ok) {
+      const destroyJSON = await destroyResponse.json()
+      return core.setFailed(
+        `Destroy failed with status ${
+          destroyResponse.status
+        } and message: ${JSON.stringify(destroyJSON)}`
+      )
+    }
+
+    core.info('Destroy succeeded')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    core.setFailed(error?.message || 'Unknown error')
   }
 }
 
