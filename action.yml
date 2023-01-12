@@ -1,11 +1,19 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Swarmpit Stack Destroy'
+description: 'Destroys a stack using swarmpit'
+author: 'First & Third'
+branding:
+  icon: cloud-off
+  color: red
 inputs:
-  milliseconds: # change this
+  url:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'URL of your swarmpit instance'
+  api-key:
+    required: true
+    description: 'Swarmpit api key, you can get this from the swarmpit admin'
+  stack:
+    required: true
+    description: 'Name of the stack you want destroyed'
 runs:
   using: 'node16'
   main: 'dist/index.js'
